@@ -18,10 +18,9 @@ from django.urls import path
 from .views import StoreStatusByTimeAndStoreId, StoreHoursByStoreId, StoreTimeZoneByStoreId
 
 
-urlpatterns = [
+urlpatterns = [ 
     path('admin/', admin.site.urls),
     path('store-status/', StoreStatusByTimeAndStoreId.as_view(), name='store_status_by_time_and_store_id'),
     path('store-hours/', StoreHoursByStoreId.as_view(), name='store_hours_by_store_id'),
     path('store-time-zone/', StoreTimeZoneByStoreId.as_view(), name='store_time_zone_by_store_id'),
-
 ]

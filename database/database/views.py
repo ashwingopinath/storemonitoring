@@ -24,12 +24,14 @@ class StoreStatusByTimeAndStoreId(APIView):
         except ValueError:
             return Response({'error': 'start_time and end_time should be in ISO format'},
                             status=status.HTTP_400_BAD_REQUEST)
-
-        store_statuses = StoreStatus.objects.filter(
-            store_id=store_id,
-            timestamp_utc__gte=start_time,
-            timestamp_utc__lte=end_time
-        )
+        try:
+            store_statuses = StoreStatus.objects.filter(
+                store_id=store_id,
+                timestamp_utc__gte=start_time,
+                timestamp_utc__lte=end_time
+            ).order_by('timestamp_utc')
+        except StoreStatus.DoesNotExist:
+            return Response("No entries found.",status=status.HTTP_404_NOT_FOUND)
         serializer = StoreStatusSerializer(store_statuses, many=True)
         return Response(serializer.data)
 
@@ -40,8 +42,10 @@ class StoreHoursByStoreId(APIView):
 
         if not store_id:
             return Response({'error': 'store_id is a required parameter'}, status=status.HTTP_400_BAD_REQUEST)
-
-        store_hours = StoreHours.objects.filter(store_id=store_id)
+        try:
+            store_hours = StoreHours.objects.filter(store_id=store_id)
+        except StoreHours.DoesNotExist:
+            return Response("No entries found.",status=status.HTTP_404_NOT_FOUND)
         serializer = StoreHoursSerializer(store_hours, many=True)
         return Response(serializer.data)
 
@@ -53,6 +57,9 @@ class StoreTimeZoneByStoreId(APIView):
         if not store_id:
             return Response({'error': 'store_id is a required parameter'}, status=status.HTTP_400_BAD_REQUEST)
 
-        store_time_zone = StoreTimeZone.objects.filter(store_id=store_id)
+        try:
+            store_time_zone = StoreTimeZone.objects.filter(store_id=store_id)
+        except StoreTimeZone.DoesNotExist:
+            return Response("No entry found",status=status.HTTP_404_NOT_FOUND)
         serializer = StoreTimeZoneSerializer(store_time_zone, many=True)
         return Response(serializer.data)
